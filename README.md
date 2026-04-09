@@ -35,17 +35,9 @@ This relevenat information is then passed into A LLM, and the awnser is displaye
    The retrieved context is passed to a language model to generate grounded answers.
 
 
-
 ---
 
 ## Installation
-
-Clone the repository:
-
-```bash
-git clone https://github.com/yourusername/rag-research-assistant.git
-cd rag-research-assistant
-
 
 # Technologies
 - Python
@@ -55,3 +47,8 @@ cd rag-research-assistant
 - PyMuPDF
 - LangChain text splitters
 - arXiv APIs
+
+
+Clone the repository:
+```bash
+git clone https://github.com/ArmandMeijers/CompSci-research-paper-RAG
