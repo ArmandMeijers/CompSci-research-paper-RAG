@@ -196,6 +196,7 @@ def append_chunks_pdf(new_files: list[str], json_path: str) -> list[dict]:
                         }
                     })
 
+                    chunk_data.append({chunk_data})
                     chunk_data.append(chunk_data) 
                     new_chunks.append(chunk_data)
 

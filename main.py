@@ -4,7 +4,7 @@ Date: 03/04/2026
 Description: main file that puts all fucntions toegther to run full pipeline
 '''
 
-from src import ingestion, retriever, downloader
+from src import ingestion, retriever, downloader, generator
 from src import helper
 import json, os, faiss
 
@@ -41,7 +41,7 @@ def load_up():
     if os.path.exists(CHUNK_JSON_PATH) and os.path.getsize(CHUNK_JSON_PATH) == 0:
         #run chunking on all pdfs in folder
         chunk_metadata = ingestion.chunking_files_pdf(DOCUMENT_PATH)
-        if chunk_metadata == 0: # error check
+        if not chunk_metadata: # error check
             return False
       
         #runs embedding modle on chunks and saves it so a faiss file
@@ -74,19 +74,25 @@ def load_up():
 def main():
     load_up()
     index = ingestion.load_or_create_index(INDEX_PATH, CHUNK_JSON_PATH)
-    if index == False:
-        return False
-
-
-    query, user_vector = retriever.prompt_user_query()
-    distances, indices = retriever.cosine_similarity(index, user_vector)
+    if not index:
+        return
 
     with open(CHUNK_JSON_PATH, "r", encoding="utf-8") as f:
         chunk_metadata = json.load(f)
 
-    for idx, dist in zip(indices[0], distances[0]):
-        chunk = chunk_metadata[idx]["text"]
-        print(f"Distance: {dist:.3f} | Text: {chunk}...")
+    while True:
+        query = retriever.get_user_query()
+        user_vector = retriever.embed_query(query)
+
+        results = retriever.retrieve_top_k(index, chunk_metadata, user_vector)
+
+        answer = generator.generate_answer(query, results)
+        print(f"\nAnswer:\n{answer}\n")
+
+        repeat = input("Ask another question? (y/n): ").strip().lower()
+        if repeat != "y":
+            print("Goodbye!")
+            break
 
     
 if __name__ == "__main__":
