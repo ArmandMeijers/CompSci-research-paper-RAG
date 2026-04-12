@@ -50,3 +50,33 @@ def cosine_similarity(index, query_vector, top_k=5):
     
     distances, indices = index.search(query_vector, top_k)
     return distances, indices
+
+def retrieve_top_k(index, chunk_metadata: list[dict], user_vector: np.ndarray, top_k: int = 5) -> list[dict]:
+    """
+    Searches FAISS index with user query vector and returns top K matching chunks.
+
+    Args:
+        index: FAISS index
+        chunk_metadata (list[dict]): list of chunk dicts with "text" and "meta"
+        user_vector (np.ndarray): embedded query vector, shape (1, dim)
+        top_k (int): number of results to return
+
+    Returns:
+        list[dict]: top K chunks with their text and metadata
+    """
+
+    distances, indices = cosine_similarity(index, user_vector, top_k)
+
+    results = []
+    for dist, idx in zip(distances[0], indices[0]):
+        if idx == -1:  # FAISS returns -1 for empty slots
+            continue
+
+        chunk = chunk_metadata[idx]
+        results.append({
+            "text": chunk["text"],
+            "meta": chunk["meta"],
+            "score": float(dist)
+        })
+
+    return results

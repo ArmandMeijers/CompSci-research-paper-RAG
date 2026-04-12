@@ -81,12 +81,11 @@ def main():
         chunk_metadata = json.load(f)
 
     while True:
-        query = retriever.get_user_query()
-        user_vector = retriever.embed_query(query)
+        query, user_vector = retriever.prompt_user_query()
 
         results = retriever.retrieve_top_k(index, chunk_metadata, user_vector)
 
-        answer = generator.generate_answer(query, results)
+        answer = generator.generate_answer_claude(query, results)
         print(f"\nAnswer:\n{answer}\n")
 
         repeat = input("Ask another question? (y/n): ").strip().lower()

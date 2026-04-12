@@ -141,13 +141,10 @@ def append_chunks_pdf(new_files: list[str], json_path: str) -> list[dict]:
         chunk_metadata(List[Dict]): New data that got appended
     """
     
-    #chunk tokens
     CHUNK_SIZE = 500
     CHUNK_OVERLAP = 50
-
     new_chunks = []
 
-    #load existing metadata if exists
     if os.path.exists(json_path) and os.path.getsize(json_path) > 0:
         with open(json_path, "r", encoding="utf-8") as f:
             chunk_data = json.load(f)
@@ -159,13 +156,13 @@ def append_chunks_pdf(new_files: list[str], json_path: str) -> list[dict]:
         chunk_index = max(chunk["meta"]["chunk_index"] for chunk in chunk_data)
 
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size = CHUNK_SIZE,
-        chunk_overlap = CHUNK_OVERLAP,
+        chunk_size=CHUNK_SIZE,
+        chunk_overlap=CHUNK_OVERLAP,
     )
 
     for path in new_files:
         page_index = 0
-        filename = os.path.basename(path)  # remove full path, keep only file name
+        filename = os.path.basename(path)
 
         try:
             doc = pymupdf.open(path)
@@ -177,16 +174,15 @@ def append_chunks_pdf(new_files: list[str], json_path: str) -> list[dict]:
             for page in doc:
                 page_index += 1
                 page_text = page.get_text()
-                
-                if not page_text.strip(): 
+
+                if not page_text.strip():
                     continue
 
                 chunks = text_splitter.split_text(page_text)
 
                 for chunk in chunks:
                     chunk_index += 1
-                    
-                    chunk_data.append({
+                    new_chunk = {
                         "id": f"{filename}_{page_index}_{chunk_index}",
                         "text": chunk,
                         "meta": {
@@ -194,26 +190,19 @@ def append_chunks_pdf(new_files: list[str], json_path: str) -> list[dict]:
                             "page": page_index,
                             "chunk_index": chunk_index,
                         }
-                    })
-
-                    chunk_data.append({chunk_data})
-                    chunk_data.append(chunk_data) 
-                    new_chunks.append(chunk_data)
-
-                
+                    }
+                    chunk_data.append(new_chunk)
+                    new_chunks.append(new_chunk)
 
         except Exception as e:
             print(f"Error: {filename}: {e}")
-
         finally:
             doc.close()
 
-    #save back to json
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(chunk_data, f, indent=2, ensure_ascii=False)
 
     print(f"[LOG] Appended {len(new_chunks)} chunks from {len(new_files)} files")
-
     return new_chunks
 
 
@@ -265,27 +254,29 @@ def append_embeddings(data: list[dict], vector_path: str) -> str:
         index (fiass.Indexflat2): embedded vector
         vector_path (str): path to FAISS index file
     """
+    if not data:                                         
+        print("[LOG] No new chunks to embed, skipping.")
+        return None, vector_path
 
-    # Extract text and embed
     texts = [chunk["text"] for chunk in data]
     embeddings = model.encode(texts, batch_size=64, show_progress_bar=True)
     vectors = np.array(embeddings).astype("float32")
-    faiss.normalize_L2(vectors)
 
-    # Load existing FAISS index if it exists, otherwise create new
+    if vectors.ndim < 2 or vectors.shape[0] == 0:
+        print("[LOG] Empty vectors, skipping.")
+        return None, vector_path
+
+    faiss.normalize_L2(vectors)
     dimension = vectors.shape[1]
 
-    if os.path.exists(vector_path):
+    if os.path.exists(vector_path) and os.path.getsize(vector_path) > 0:
         index = faiss.read_index(vector_path)
         print("[LOG] Loaded existing FAISS index")
     else:
         index = faiss.IndexFlatL2(dimension)
         print("[LOG] Created new FAISS index")
 
-    # Add new vectors
     index.add(vectors)
-
-    # Ensure directory exists and save index
     os.makedirs(os.path.dirname(vector_path), exist_ok=True)
     faiss.write_index(index, vector_path)
     print(f"[LOG] FAISS vector DB saved at: {vector_path}")
