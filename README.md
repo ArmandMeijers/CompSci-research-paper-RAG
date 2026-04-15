@@ -109,9 +109,9 @@ python3 main.py
 CompSci-research-paper-RAG/
 ├── data/               # All Raw/Processed data (created when main is run)
 ├── src/
-│   ├── ingest.py       # Paper downloading and chunking
-│   ├── embed.py        # Embedding generation and indexing
+│   ├── ingest.py       # Chunking, Embedding generation and Indexing
 │   ├── retrieve.py     # Query embedding and FAISS search
+│   ├── downloader.py   # Downloads acedemic papers
 │   └── generate.py     # LLM context formatting and generation
 └── main.py             # Entry point
 ```
