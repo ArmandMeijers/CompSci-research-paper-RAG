@@ -85,7 +85,7 @@ def main():
 
         results = retriever.retrieve_top_k(index, chunk_metadata, user_vector)
 
-        answer = generator.generate_answer_claude(query, results)
+        answer = generator.generate_answer_llama(query, results)
         print(f"\nAnswer:\n{answer}\n")
 
         repeat = input("Ask another question? (y/n): ").strip().lower()

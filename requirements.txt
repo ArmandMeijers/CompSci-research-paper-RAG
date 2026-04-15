@@ -2,5 +2,6 @@ sentence-transformers>=2.2.2
 numpy>=1.25.0
 faiss-cpu>=1.7.4
 PyMuPDF>=1.22.5
-langchain>=0.1.0
+langchain-text-splitters>=0.0.1
 arxiv>=1.4.6
+ollama>=0.6.1
