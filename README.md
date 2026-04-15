@@ -51,6 +51,13 @@ At query time, the user's question is embedded and compared against the FAISS in
 Retrieved chunks are formatted as context and passed to Llama 3.2 (3B) via Ollama. The model generates a response grounded in the retrieved chunk content.
 
 ---
+## DEMO
+
+<video width="600" controls>
+  <source src="media/Rag_demo.mp4" type="video/mp4">
+</video>
+
+---
 
 ## Tech Stack
 
@@ -108,6 +115,7 @@ python3 main.py
 ```
 CompSci-research-paper-RAG/
 ├── data/               # All Raw/Processed data (created when main is run)
+├── media/              # Demo content
 ├── src/
 │   ├── ingest.py       # Chunking, Embedding generation and Indexing
 │   ├── retrieve.py     # Query embedding and FAISS search

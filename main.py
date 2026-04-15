@@ -15,7 +15,7 @@ INDEX_PATH = "data/processed/vectors/index.faiss"
 CHUNK_JSON_PATH = "data/processed/metadata/chunk_metadata.json"
 DOC_JSON_PATH = "data/processed/metadata/doc_metadata.json"
 
-MAX_PAPERS = 30
+MAX_PAPERS = 10
 CATEGORIES = ["cs.LG","cs.AI","cs.CL","cs.CV"] #types of papers searched for.
 #"cs.LG","cs.AI","cs.CL","cs.CV"
 
