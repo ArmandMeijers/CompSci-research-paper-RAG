@@ -53,9 +53,7 @@ Retrieved chunks are formatted as context and passed to Llama 3.2 (3B) via Ollam
 ---
 ## DEMO
 
-<video width="600" controls>
-  <source src="media/Rag_demo.mp4" type="video/mp4">
-</video>
+[![Demo]](media\Rag_demo.mp4)
 
 ---
 
